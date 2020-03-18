@@ -78,7 +78,7 @@ type Consumer struct {
 // returned from the AWS Kinesis library.
 // If an error is returned, scanning stops. The sole exception is when the
 // function returns the special value ErrSkipCheckpoint.
-type ScanFunc func(*Record) error
+type ScanFunc func(*Record, string) error
 
 // ErrSkipCheckpoint is used as a return value from ScanFunc to indicate that
 // the current checkpoint should be skipped skipped. It is not returned
@@ -184,7 +184,7 @@ func (c *Consumer) ScanShard(ctx context.Context, shardID string, fn ScanFunc) e
 				case <-ctx.Done():
 					return nil
 				default:
-					err := fn(r)
+					err := fn(r, shardID)
 					if err != nil && err != ErrSkipCheckpoint {
 						return err
 					}
